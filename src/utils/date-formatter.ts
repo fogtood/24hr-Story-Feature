@@ -1,4 +1,4 @@
-import { formatDistanceToNow, differenceInSeconds } from 'date-fns';
+import { formatDistanceToNowStrict, differenceInSeconds } from 'date-fns';
 
 export const formatDate = (date: number): string => {
     const secondsAgo = differenceInSeconds(new Date(), date);
@@ -7,6 +7,6 @@ export const formatDate = (date: number): string => {
         return 'just now';
     }
 
-    return formatDistanceToNow(date, { addSuffix: true });
+    return formatDistanceToNowStrict(date, { addSuffix: true });
 };
 
