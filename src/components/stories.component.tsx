@@ -32,6 +32,7 @@ const Stories = ({
           <Story
             key={story.id}
             imgURL={story.imgURL}
+            createdAt={story.createdAt}
             onClick={handleStoryViewOpen}
           />
         ))}

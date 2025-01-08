@@ -1,8 +1,12 @@
+import { formatDate } from "../utils/date-formatter";
+
 const Story = ({
   imgURL,
+  createdAt,
   onClick,
 }: {
   imgURL: string;
+  createdAt: number;
   onClick: () => void;
 }) => {
   return (
@@ -18,7 +22,7 @@ const Story = ({
           />
         </div>
       </button>
-      <p className="truncate text-center text-xs">1 hour ago</p>
+      <p className="truncate text-center text-xs">{formatDate(createdAt)}</p>
     </div>
   );
 };
