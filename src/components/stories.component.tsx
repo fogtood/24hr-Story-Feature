@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useStoryContext } from "../context/stories.context";
 import ImageUploader from "./image-uploader.component";
 import Story from "./story.component";
 
@@ -7,23 +8,33 @@ const Stories = ({
 }: {
   handleStoryViewOpen: () => void;
 }) => {
+  const { stories, setStories } = useStoryContext();
+  const id = Math.floor(Math.random() * 1000000);
+
   const [image, setImage] = useState<File | null>(null);
-  const imgURL = image ? URL.createObjectURL(image) : "";
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
+
     if (files && files.length > 0) {
       const file = files[0];
       setImage(file);
+      const imgURL = URL.createObjectURL(file);
+      setStories([{ id, imgURL, createdAt: Date.now() }, ...stories]);
     }
   };
 
   return (
-    <div className="scrollbar-hide flex gap-x-3 overflow-hidden overflow-x-auto p-2">
+    <div className="flex gap-x-3 overflow-hidden overflow-x-auto p-2 scrollbar-hide">
       <ImageUploader handleImageUpload={handleImageUpload} />
-      {[...Array(2)].map((_, idx) => (
-        <Story key={idx} imgURL={imgURL} onClick={handleStoryViewOpen} />
-      ))}
+      {stories &&
+        stories.map((story) => (
+          <Story
+            key={story.id}
+            imgURL={story.imgURL}
+            onClick={handleStoryViewOpen}
+          />
+        ))}
     </div>
   );
 };

@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useStoryContext } from "../context/stories.context";
 import Stories from "./stories.component";
 import StoryView from "./story-view.component";
 
 const Container = () => {
   const [isStoryView, setIsStoryView] = useState(false);
+  const { stories } = useStoryContext();
 
   const handleStoryViewOpen = () => setIsStoryView(true);
   const handleStoryViewClose = () => setIsStoryView(false);
@@ -15,6 +17,11 @@ const Container = () => {
         <div className="mt-5">
           <Stories handleStoryViewOpen={handleStoryViewOpen} />
         </div>
+        {stories.length === 0 && (
+          <p className="my-10 text-center">
+            No stories yet. Click the + button to add your first story!
+          </p>
+        )}
       </div>
       {isStoryView ? (
         <StoryView handleStoryViewClose={handleStoryViewClose} />
