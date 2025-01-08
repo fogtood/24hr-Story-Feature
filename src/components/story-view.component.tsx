@@ -48,16 +48,19 @@ const StoryView = ({
     >
       {/* Progress bars */}
       <div className="absolute left-0 right-0 top-0 z-10 flex space-x-2 p-2">
-        {stories.map((story) => (
-          <ProgressBar
-            key={story.id}
-            // index={idx}
-            // currentIndex={currentIndex}
-            // isPlaying={isPlaying}
-          />
-        ))}
+        {stories.map((story) => {
+          const widthPerStory = `${100 / stories.length}%`;
+          return (
+            <ProgressBar
+              key={story.id}
+              width={widthPerStory}
+              // index={idx}
+              // currentIndex={currentIndex}
+              // isPlaying={isPlaying}
+            />
+          );
+        })}
       </div>
-
       {/* Top Controls */}
       <div className="absolute right-4 top-4 z-30 m-3 flex items-center gap-2 text-white/80">
         <button className="hover:text-white">
@@ -68,21 +71,18 @@ const StoryView = ({
           <X size={20} />
         </button>
       </div>
-
       {/* Left Checvron*/}
       <div className="absolute inset-y-0 left-0 z-20 flex items-center">
         <button onClick={handlePrevious}>
           <ChevronLeft />
         </button>
       </div>
-
       {/* Right Chevron */}
       <div className="absolute inset-y-0 right-0 z-20 flex items-center">
         <button onClick={handleNext}>
           <ChevronRight />
         </button>
       </div>
-
       {/* Story image */}
       <div className="absolute inset-0 flex items-center justify-center rounded-md">
         <img
@@ -91,7 +91,6 @@ const StoryView = ({
           className="max-h-[80vh] max-w-full object-contain"
         />
       </div>
-
       {/* Time indicator */}
       <div className="absolute bottom-4 left-4 text-sm text-white/70">
         {new Date(stories[currentIndex].createdAt).toLocaleTimeString([], {
@@ -103,10 +102,10 @@ const StoryView = ({
   );
 };
 
-const ProgressBar = () => {
+const ProgressBar = ({ width }: { width: string }) => {
   return (
     // <div className="hidden h-0.5 w-full items-center space-x-1 md:flex">
-    <div className="h-0.5 w-1/2 rounded bg-white" />
+    <div className="h-0.5 w-1/2 rounded bg-white" style={{ width }} />
     // <span className="h-full w-1/2 rounded bg-white" />
     // </div>
   );

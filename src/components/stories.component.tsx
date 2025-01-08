@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useStoryContext } from "../context/stories.context";
+import { convertImageToBase64 } from "../utils/imageToBase64";
 import ImageUploader from "./image-uploader.component";
 import Story from "./story.component";
 
@@ -13,13 +14,24 @@ const Stories = ({
 
   const [image, setImage] = useState<File | null>(null);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
 
-    if (files && files.length > 0) {
-      const file = files[0];
+    if (file) {
       setImage(file);
-      const imgURL = URL.createObjectURL(file);
+
+      let imgURL = "";
+      try {
+        imgURL = await convertImageToBase64(file);
+      } catch (error) {
+        console.error(
+          "An error occured while converting image to base64",
+          error,
+        );
+        alert("Something went wrong😑");
+        return;
+      }
+
       setStories([{ id, imgURL, createdAt: Date.now() }, ...stories]);
     }
   };
