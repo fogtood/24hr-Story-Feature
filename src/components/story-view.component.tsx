@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useStoryContext } from "../context/stories.context";
 import { ChevronLeft, ChevronRight, Pause, Play, X } from "lucide-react";
+import ProgressBar from "./progress-bar.component";
 
 const StoryView = ({
   handleStoryViewClose,
@@ -9,22 +10,64 @@ const StoryView = ({
 }) => {
   const { stories } = useStoryContext();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [completedIndices, setCompletedIndices] = useState<number[]>([]);
+  const duration = 3000; // 3 seconds per story
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
   const handleNext = useCallback(() => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % stories.length);
-  }, [stories.length]);
+    // Mark current story as completed
+    setCompletedIndices((prev) => [...new Set([...prev, currentIndex])]);
+    // Move to the next story
+    setCurrentIndex((prevIndex) => Math.min(prevIndex + 1, stories.length - 1));
+  }, [currentIndex, stories.length]);
 
   const handlePrevious = useCallback(() => {
-    setCurrentIndex(
-      (prevIndex) => (prevIndex - 1 + stories.length) % stories.length,
+    // Revert completion of the previous story
+    setCompletedIndices((prev) =>
+      prev.filter((index) => index !== currentIndex - 1),
     );
-  }, [stories.length]);
+    // Move to the previous story
+    setCurrentIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+  }, [currentIndex]);
+
+  useEffect(() => {
+    // Clear existing timeout
+    if (timeoutId) clearTimeout(timeoutId);
+
+    // If all stories are completed, close the StoryView
+    if (completedIndices.length === stories.length) {
+      handleStoryViewClose();
+      return;
+    }
+
+    // Set a new timeout to move to the next story
+    const timer = setTimeout(() => {
+      setCompletedIndices((prev) => [...new Set([...prev, currentIndex])]);
+      if (currentIndex < stories.length - 1) {
+        handleNext();
+      } else {
+        handleStoryViewClose();
+      }
+    }, duration);
+
+    // Save the timeout ID for later clearing
+    setTimeoutId(timer);
+
+    return () => clearTimeout(timer);
+  }, [
+    currentIndex,
+    completedIndices,
+    stories.length,
+    handleNext,
+    handleStoryViewClose,
+    duration,
+  ]);
 
   useEffect(() => {
     const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight") {
+      if (e.key === "ArrowRight" && currentIndex < stories.length - 1) {
         handleNext();
-      } else if (e.key === "ArrowLeft") {
+      } else if (e.key === "ArrowLeft" && currentIndex > 0) {
         handlePrevious();
       } else if (e.key === "Escape") {
         handleStoryViewClose();
@@ -33,34 +76,31 @@ const StoryView = ({
 
     window.addEventListener("keyup", handleKeyUp);
 
-    // Cleanup function
     return () => {
       window.removeEventListener("keyup", handleKeyUp);
     };
-  }, [handleNext, handlePrevious, handleStoryViewClose]);
+  }, [
+    handleNext,
+    handlePrevious,
+    handleStoryViewClose,
+    currentIndex,
+    stories.length,
+  ]);
 
   return (
-    <div
-      className="fixed inset-0 z-50 touch-pan-y bg-black"
-      // onTouchStart={handleTouchStart}
-      // onTouchMove={handleTouchMove}
-      // onTouchEnd={handleTouchEnd}
-    >
-      {/* Progress bars */}
+    <div className="fixed inset-0 z-50 touch-pan-y bg-black">
+      {/* Progress Bars */}
       <div className="absolute left-0 right-0 top-0 z-10 flex space-x-2 p-2">
-        {stories.map((story) => {
-          const widthPerStory = `${100 / stories.length}%`;
-          return (
-            <ProgressBar
-              key={story.id}
-              width={widthPerStory}
-              // index={idx}
-              // currentIndex={currentIndex}
-              // isPlaying={isPlaying}
-            />
-          );
-        })}
+        {stories.map((_, idx) => (
+          <ProgressBar
+            key={idx}
+            isActive={idx === currentIndex}
+            duration={duration}
+            isCompleted={completedIndices.includes(idx)}
+          />
+        ))}
       </div>
+
       {/* Top Controls */}
       <div className="absolute right-4 top-4 z-30 m-3 flex items-center gap-2 text-white/80">
         <button className="hover:text-white">
@@ -71,19 +111,26 @@ const StoryView = ({
           <X size={20} />
         </button>
       </div>
-      {/* Left Checvron*/}
-      <div className="absolute inset-y-0 left-0 z-20 flex items-center">
-        <button onClick={handlePrevious}>
-          <ChevronLeft />
-        </button>
-      </div>
+
+      {/* Left Chevron */}
+      {currentIndex > 0 && (
+        <div className="absolute inset-y-0 left-0 z-20 flex items-center">
+          <button onClick={handlePrevious}>
+            <ChevronLeft />
+          </button>
+        </div>
+      )}
+
       {/* Right Chevron */}
-      <div className="absolute inset-y-0 right-0 z-20 flex items-center">
-        <button onClick={handleNext}>
-          <ChevronRight />
-        </button>
-      </div>
-      {/* Story image */}
+      {currentIndex + 1 !== stories.length && (
+        <div className="absolute inset-y-0 right-0 z-20 flex items-center">
+          <button onClick={handleNext}>
+            <ChevronRight />
+          </button>
+        </div>
+      )}
+
+      {/* Story Image */}
       <div className="absolute inset-0 flex items-center justify-center rounded-md">
         <img
           src={stories[currentIndex].imgURL}
@@ -91,7 +138,8 @@ const StoryView = ({
           className="max-h-[80vh] max-w-full object-contain"
         />
       </div>
-      {/* Time indicator */}
+
+      {/* Time Indicator */}
       <div className="absolute bottom-4 left-4 text-sm text-white/70">
         {new Date(stories[currentIndex].createdAt).toLocaleTimeString([], {
           hour: "2-digit",
@@ -99,15 +147,6 @@ const StoryView = ({
         })}
       </div>
     </div>
-  );
-};
-
-const ProgressBar = ({ width }: { width: string }) => {
-  return (
-    // <div className="hidden h-0.5 w-full items-center space-x-1 md:flex">
-    <div className="h-0.5 w-1/2 rounded bg-white" style={{ width }} />
-    // <span className="h-full w-1/2 rounded bg-white" />
-    // </div>
   );
 };
 
