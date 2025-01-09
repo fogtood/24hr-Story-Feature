@@ -7,7 +7,7 @@ import Story from "./story.component";
 const Stories = ({
   handleStoryViewOpen,
 }: {
-  handleStoryViewOpen: () => void;
+  handleStoryViewOpen: (idx: number) => void;
 }) => {
   const { stories, setStories } = useStoryContext();
   const id = Math.floor(Math.random() * 1000000);
@@ -40,12 +40,12 @@ const Stories = ({
     <div className="flex gap-x-3 overflow-hidden overflow-x-auto p-2 scrollbar-hide">
       <ImageUploader handleImageUpload={handleImageUpload} />
       {stories &&
-        stories.map((story) => (
+        stories.map((story, idx) => (
           <Story
             key={story.id}
             imgURL={story.imgURL}
             createdAt={story.createdAt}
-            onClick={handleStoryViewOpen}
+            onClick={() => handleStoryViewOpen(idx)}
           />
         ))}
     </div>

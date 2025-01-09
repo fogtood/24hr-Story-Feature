@@ -5,12 +5,16 @@ import ProgressBar from "./progress-bar.component";
 
 const StoryView = ({
   handleStoryViewClose,
+  storyClicked,
 }: {
   handleStoryViewClose: () => void;
+  storyClicked: number | null;
 }) => {
   const { stories } = useStoryContext();
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [completedIndices, setCompletedIndices] = useState<number[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(storyClicked || 0);
+  const [completedIndices, setCompletedIndices] = useState<number[]>(
+    Array.from({ length: storyClicked || 0 }, (_, idx) => idx),
+  );
   const duration = 3000; // 3 seconds per story
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
@@ -102,7 +106,7 @@ const StoryView = ({
       </div>
 
       {/* Top Controls */}
-      <div className="absolute right-4 top-4 z-30 m-3 flex items-center gap-2 text-white/80">
+      <div className="absolute right-4 top-4 z-30 m-3 mr-0 flex items-center gap-2 text-white md:mr-3">
         <button className="hover:text-white">
           <Pause size={20} />
           <Play size={20} className="hidden" />
@@ -114,18 +118,18 @@ const StoryView = ({
 
       {/* Left Chevron */}
       {currentIndex > 0 && (
-        <div className="absolute inset-y-0 left-0 z-20 flex items-center">
+        <div className="absolute inset-y-0 left-0 z-20 flex items-center text-white">
           <button onClick={handlePrevious}>
-            <ChevronLeft />
+            <ChevronLeft size={30} />
           </button>
         </div>
       )}
 
       {/* Right Chevron */}
       {currentIndex + 1 !== stories.length && (
-        <div className="absolute inset-y-0 right-0 z-20 flex items-center">
+        <div className="absolute inset-y-0 right-0 z-20 flex items-center text-white">
           <button onClick={handleNext}>
-            <ChevronRight />
+            <ChevronRight size={30} />
           </button>
         </div>
       )}

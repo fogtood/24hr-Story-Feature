@@ -6,8 +6,12 @@ import StoryView from "./story-view.component";
 const Container = () => {
   const [isStoryView, setIsStoryView] = useState(false);
   const { stories } = useStoryContext();
+  const [storyClicked, setStoryClicked] = useState<number | null>(null);
 
-  const handleStoryViewOpen = () => setIsStoryView(true);
+  const handleStoryViewOpen = (idx: number) => {
+    setIsStoryView(true);
+    setStoryClicked(idx);
+  };
   const handleStoryViewClose = () => setIsStoryView(false);
 
   return (
@@ -24,7 +28,10 @@ const Container = () => {
         )}
       </div>
       {isStoryView ? (
-        <StoryView handleStoryViewClose={handleStoryViewClose} />
+        <StoryView
+          handleStoryViewClose={handleStoryViewClose}
+          storyClicked={storyClicked}
+        />
       ) : null}
     </>
   );

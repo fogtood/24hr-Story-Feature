@@ -12,7 +12,7 @@ const Story = ({
   return (
     <div className="inline-block max-w-[64px]">
       <button
-        className="h-16 w-16 cursor-pointer overflow-hidden rounded-full border-2 border-gray-400 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+        className="h-16 w-16 cursor-pointer overflow-hidden rounded-full border-2 border-gray-400 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-0"
         onClick={onClick}
       >
         <div className="h-full w-full p-0.5">
