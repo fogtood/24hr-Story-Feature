@@ -13,6 +13,7 @@ const Stories = ({
   const id = Math.floor(Math.random() * 1000000);
 
   const [image, setImage] = useState<File | null>(null);
+  console.log(image);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
