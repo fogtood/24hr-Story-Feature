@@ -1,6 +1,7 @@
-import Container from "./components/container.component";
-import "./App.css";
 import { StoriesProvider } from "./context/stories.context";
+import Container from "./components/container.component";
+
+import "./App.css";
 
 const App = () => {
   return (
